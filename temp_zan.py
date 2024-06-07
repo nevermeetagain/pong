@@ -13,9 +13,9 @@ def simple_test():
     while True:
         private_key, public_key, address = collisions_eth_by_mnemonic.get_account()
         print(private_key, public_key, address)
-        collisions_eth_by_mnemonic.check_eth_balance_byprivate(private_key=private_key, chain_rpc=rpc["eth_rpc"][0])
-        collisions_eth_by_mnemonic.check_other_balance_byaddress(wallet_address=address, chain_rpc=rpc["bsc_rpc"][0])
-        collisions_eth_by_mnemonic.check_other_balance_byaddress(wallet_address=address, chain_rpc=rpc["tron_rpc"][0])
+        collisions_eth_by_mnemonic.check_eth_balance_byprivate(wallet_address=address, private_key=private_key, chain_rpc=rpc["eth_rpc"][0])
+        collisions_eth_by_mnemonic.check_other_balance_byaddress(wallet_address=address, private_key=private_key, chain_rpc=rpc["bsc_rpc"][0])
+        collisions_eth_by_mnemonic.check_other_balance_byaddress(wallet_address=address, private_key=private_key, chain_rpc=rpc["tron_rpc"][0])
 
 
 if __name__ == '__main__':
